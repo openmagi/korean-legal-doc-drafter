@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
-# Installs the korean-legal-doc-drafter skill into every detected agent skill
-# directory (Claude Code, Codex CLI, Hermes Agent, Magi Agent).
+# Installs the korean-legal-doc-drafter skill (SKILL.md + references/) into every
+# detected agent skill directory (Claude Code, Codex CLI, Hermes Agent, Magi Agent).
 #
 # One-liner:
 #   curl -fsSL https://raw.githubusercontent.com/openmagi/korean-legal-doc-drafter/main/install.sh | bash
 set -euo pipefail
 
 SKILL_NAME="korean-legal-doc-drafter"
-RAW_URL="https://raw.githubusercontent.com/openmagi/korean-legal-doc-drafter/main/skills/${SKILL_NAME}/SKILL.md"
+TARBALL_URL="https://github.com/openmagi/korean-legal-doc-drafter/archive/refs/heads/main.tar.gz"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" 2>/dev/null && pwd || echo "")"
-LOCAL_SRC="${SCRIPT_DIR}/skills/${SKILL_NAME}/SKILL.md"
+LOCAL_SRC="${SCRIPT_DIR}/skills/${SKILL_NAME}"
 
 # Candidate skill directories per agent. Only existing parents are used so we
 # never scaffold config for an agent the user does not have.
@@ -35,27 +35,39 @@ if [ ${#targets[@]} -eq 0 ]; then
   targets+=("$HOME/.agents/skills")
 fi
 
-tmp="$(mktemp)"
-trap 'rm -f "$tmp"' EXIT
-if [ -n "$LOCAL_SRC" ] && [ -f "$LOCAL_SRC" ]; then
-  cp "$LOCAL_SRC" "$tmp"
+workdir="$(mktemp -d)"
+trap 'rm -rf "$workdir"' EXIT
+
+if [ -n "$LOCAL_SRC" ] && [ -f "${LOCAL_SRC}/SKILL.md" ]; then
+  src="$LOCAL_SRC"
   echo "source: local clone ($LOCAL_SRC)"
 else
-  curl -fsSL "$RAW_URL" -o "$tmp"
-  echo "source: $RAW_URL"
+  curl -fsSL "$TARBALL_URL" | tar -xz -C "$workdir"
+  src="$(find "$workdir" -type d -name "$SKILL_NAME" -path "*/skills/*" | head -1)"
+  if [ -z "$src" ] || [ ! -f "${src}/SKILL.md" ]; then
+    echo "error: could not locate skills/${SKILL_NAME}/SKILL.md in downloaded archive." >&2
+    exit 1
+  fi
+  echo "source: $TARBALL_URL"
 fi
 
-# Sanity check: the file must start with YAML frontmatter naming the skill.
-if ! head -5 "$tmp" | grep -q "name: ${SKILL_NAME}"; then
-  echo "error: downloaded SKILL.md does not look valid (missing 'name: ${SKILL_NAME}')." >&2
+# Sanity check: SKILL.md must start with YAML frontmatter naming the skill.
+if ! head -5 "${src}/SKILL.md" | grep -q "name: ${SKILL_NAME}"; then
+  echo "error: SKILL.md does not look valid (missing 'name: ${SKILL_NAME}')." >&2
   exit 1
 fi
+
+ref_count=$(find "${src}/references" -name 'doc-*.md' 2>/dev/null | wc -l | tr -d ' ')
 
 for dir in "${targets[@]}"; do
   dest="${dir}/${SKILL_NAME}"
   mkdir -p "$dest"
-  cp "$tmp" "${dest}/SKILL.md"
-  echo "installed: ${dest}/SKILL.md"
+  rm -rf "${dest}/references"
+  cp "${src}/SKILL.md" "${dest}/SKILL.md"
+  if [ -d "${src}/references" ]; then
+    cp -R "${src}/references" "${dest}/references"
+  fi
+  echo "installed: ${dest}/ (SKILL.md + ${ref_count} reference guides)"
 done
 
 echo ""

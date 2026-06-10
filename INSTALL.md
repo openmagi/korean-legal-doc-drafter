@@ -6,9 +6,14 @@
 
 ## What you are installing
 
-A single skill file: `skills/korean-legal-doc-drafter/SKILL.md`
-(YAML frontmatter with `name`/`description` + markdown instructions — the
-[Agent Skills](https://agentskills.io) open format).
+The skill folder `skills/korean-legal-doc-drafter/` containing:
+- `SKILL.md` — entry point (YAML frontmatter with `name`/`description` + markdown
+  instructions — the [Agent Skills](https://agentskills.io) open format)
+- `references/doc-*.md` — per-document drafting guides (one per catalog document),
+  loaded on demand after a document type is chosen
+
+**Install the whole folder, not just SKILL.md** — the skill reads its
+`references/` files at runtime.
 
 ## Steps
 
@@ -22,19 +27,23 @@ A single skill file: `skills/korean-legal-doc-drafter/SKILL.md`
    | Magi Agent | `~/.magi/skills/` (also reads `~/.claude/skills/`) |
    | Other / unknown | `~/.agents/skills/` (cross-agent standard) |
 
-2. **Create the skill folder and fetch the file:**
+2. **Fetch the repo and copy the skill folder:**
 
    ```bash
-   mkdir -p <SKILL_DIR>/korean-legal-doc-drafter
-   curl -fsSL https://raw.githubusercontent.com/openmagi/korean-legal-doc-drafter/main/skills/korean-legal-doc-drafter/SKILL.md \
-     -o <SKILL_DIR>/korean-legal-doc-drafter/SKILL.md
+   tmp=$(mktemp -d)
+   curl -fsSL https://github.com/openmagi/korean-legal-doc-drafter/archive/refs/heads/main.tar.gz | tar -xz -C "$tmp"
+   mkdir -p <SKILL_DIR>
+   cp -R "$tmp"/korean-legal-doc-drafter-main/skills/korean-legal-doc-drafter <SKILL_DIR>/
+   rm -rf "$tmp"
    ```
 
-   If you already have a local clone of this repo, copy `skills/korean-legal-doc-drafter/SKILL.md` instead of downloading.
+   If you already have a local clone of this repo, copy `skills/korean-legal-doc-drafter/` (the whole folder) instead of downloading.
 
-3. **Verify:** the installed file must start with YAML frontmatter containing
-   `name: korean-legal-doc-drafter`. If your platform has a skill list command
-   (`/skills`, `magi skills list`, etc.), confirm the skill appears.
+3. **Verify:** `<SKILL_DIR>/korean-legal-doc-drafter/SKILL.md` must start with YAML
+   frontmatter containing `name: korean-legal-doc-drafter`, and
+   `<SKILL_DIR>/korean-legal-doc-drafter/references/` must contain `doc-*.md` files.
+   If your platform has a skill list command (`/skills`, `magi skills list`, etc.),
+   confirm the skill appears.
 
 4. **Report to the user:** where you installed it, and that it can be invoked
    with `/korean-legal-doc-drafter` (or by simply asking for a Korean legal

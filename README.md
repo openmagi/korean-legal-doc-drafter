@@ -1,7 +1,7 @@
 # korean-legal-doc-drafter
 
-한국 법률문서 자동 작성 에이전트 스킬 — 118종 문서 카탈로그 기반.
-An agent skill that drafts Korean legal documents through guided Q&A, covering 118 document types.
+한국 법률문서 자동 작성 에이전트 스킬 — 149종 문서, 문서별 상세 작성 가이드 내장.
+An agent skill that drafts Korean legal documents through guided Q&A — 149 document types, each with its own in-depth drafting guide.
 
 내용증명 · 계약서(NDA, 동업, 투자, 용역) · 근로계약 · 지급명령 신청서 · 합의서 · 고소장 · 부동산 임대차/매매 · 차용증 · 위임장 · 약관/개인정보처리방침 등.
 
@@ -34,12 +34,19 @@ curl -fsSL https://raw.githubusercontent.com/openmagi/korean-legal-doc-drafter/m
 
 ### 에이전트별 수동 설치
 
-| 에이전트 | 방법 |
+스킬은 `SKILL.md` + `references/` **폴더 전체**입니다. 폴더째 복사하세요:
+
+```bash
+git clone --depth 1 https://github.com/openmagi/korean-legal-doc-drafter.git /tmp/kldd
+cp -R /tmp/kldd/skills/korean-legal-doc-drafter <SKILL_DIR>/ && rm -rf /tmp/kldd
+```
+
+| 에이전트 | `<SKILL_DIR>` |
 |---|---|
-| **Claude Code** | `mkdir -p ~/.claude/skills/korean-legal-doc-drafter && curl -fsSL https://raw.githubusercontent.com/openmagi/korean-legal-doc-drafter/main/skills/korean-legal-doc-drafter/SKILL.md -o ~/.claude/skills/korean-legal-doc-drafter/SKILL.md` |
-| **Codex CLI** | 위와 동일하되 경로를 `~/.agents/skills/`로 — 또는 `$skill-installer https://github.com/openmagi/korean-legal-doc-drafter` |
-| **Hermes Agent** | `hermes skills install https://raw.githubusercontent.com/openmagi/korean-legal-doc-drafter/main/skills/korean-legal-doc-drafter/SKILL.md` |
-| **Magi Agent** | Claude Code와 동일 (`~/.claude/skills/` 또는 `~/.magi/skills/` 모두 인식) |
+| **Claude Code** | `~/.claude/skills/` |
+| **Codex CLI** | `~/.agents/skills/` — 또는 `$skill-installer https://github.com/openmagi/korean-legal-doc-drafter` |
+| **Hermes Agent** | `~/.hermes/skills/` — 또는 위 한 줄 설치 스크립트 사용 |
+| **Magi Agent** | `~/.claude/skills/` 또는 `~/.magi/skills/` 모두 인식 |
 
 ## 사용 (Usage)
 
@@ -52,9 +59,9 @@ curl -fsSL https://raw.githubusercontent.com/openmagi/korean-legal-doc-drafter/m
 
 ## 특징
 
-- **118종 카탈로그** + 8계열 상세 출력 템플릿 (내용증명, 지급명령, 근로계약, 합의서, 고소장, 임대차, 차용증, 개인정보처리방침)
-- 템플릿이 없는 문서도 **카테고리별 필수조항 체크리스트**로 품질 보장
-- 실무 안내 내장: 지급명령 관할·송달료·인지대, 형사합의 처벌불원서 절차, 부동산 직거래 안전장치(등기부·확정일자), 성명불상 고소, 5인 미만 사업장 분기
+- **149종 전 문서에 개별 작성 가이드** (`references/doc-*.md`, 약 2만 줄) — 문서마다 용도·법적 성격, 단계별 질문 위저드(선택지·분기), 필수 기재사항 체크리스트, 바로 쓸 수 있는 출력 템플릿 전문, 법적 함정 안내 수록
+- **Progressive disclosure**: 평소엔 가벼운 SKILL.md만 로드, 문서 유형 확정 후 해당 가이드 1개만 읽음 — 컨텍스트 낭비 없음
+- 실무 깊이: 지급명령 관할·송달료·인지대, 임금채권 연 20% 이율 특칙, 형사합의 처벌불원서 절차, 부동산 직거래 안전장치(등기부·확정일자), 성명불상 고소, 5인 미만 사업장 분기, 포괄임금 유효 요건, 가맹사업법 필수 절차 등 — 조문·판례 근거 적시
 - 변동 수치(법정이율, 송달료, 최저임금)는 최신 확인 안내 포함
 - 선택적 연계: `korean-law-research`(법령 조회), `hwpx-canine`(HWPX 내보내기) — 없어도 동작
 
