@@ -63,7 +63,7 @@ cp -R /tmp/kldd/skills/korean-legal-doc-drafter <SKILL_DIR>/ && rm -rf /tmp/kldd
 - **Progressive disclosure**: 평소엔 가벼운 SKILL.md만 로드, 문서 유형 확정 후 해당 가이드 1개만 읽음 — 컨텍스트 낭비 없음
 - 실무 깊이: 지급명령 관할·송달료·인지대, 임금채권 연 20% 이율 특칙, 형사합의 처벌불원서 절차, 부동산 직거래 안전장치(등기부·확정일자), 성명불상 고소, 5인 미만 사업장 분기, 포괄임금 유효 요건, 가맹사업법 필수 절차 등 — 조문·판례 근거 적시
 - 변동 수치(법정이율, 송달료, 최저임금)는 최신 확인 안내 포함
-- 선택적 연계: `korean-law-research`(법령 조회), `hwpx-canine`(HWPX 내보내기) — 없어도 동작
+- **완전 standalone** — 외부 스킬·서비스 의존성 없음. 마크다운 파일만으로 동작
 
 ## License
 

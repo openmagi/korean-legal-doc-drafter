@@ -51,9 +51,9 @@ The skill folder `skills/korean-legal-doc-drafter/` containing:
 
 ## Notes for the installing agent
 
-- The skill is **self-contained**. It mentions two optional companion skills
-  (`korean-law-research`, `hwpx-canine`) — do NOT try to install them; the
-  skill degrades gracefully without them.
+- The skill is **fully standalone** — SKILL.md plus its `references/` folder is
+  everything it needs. There are no companion skills, services, or API keys to
+  install or configure.
 - Do not modify the SKILL.md content during installation.
 - If multiple agent directories exist on this machine and the user said
   "install it everywhere", run `./install.sh` from the repo root instead —
